@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Products = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -73,7 +74,7 @@ const Products = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, phone }),
+        body: JSON.stringify({ name, email, phone }),
       });
 
       if (!response.ok) {
@@ -83,7 +84,8 @@ const Products = () => {
         return;
       }
 
-      console.log('Demo requested and data saved:', { email, phone });
+      console.log('Demo requested and data saved:', { name, email, phone });
+      setName('');
       setEmail('');
       setPhone('');
       toast.success("Demo request sent, we'll get back soon!");
@@ -177,6 +179,16 @@ const Products = () => {
             </p>
 
             <form onSubmit={handleDemoRequest} className="space-y-6">
+              <div className="rounded-lg bg-white/10 backdrop-blur-sm p-2">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your Name"
+                  className="w-full px-4 py-3 rounded-lg bg-transparent border-none text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  required
+                />
+              </div>
               <div className="rounded-lg bg-white/10 backdrop-blur-sm p-2">
                 <input
                   type="email"

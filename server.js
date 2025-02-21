@@ -85,14 +85,14 @@ Timestamp: ${new Date().toISOString()}
 
 // Demo Request Route
 app.post('/api/request-demo', (req, res) => {
-  const { email, phone } = req.body;
+  const { name, email, phone } = req.body;
 
   const reqDemoDir = path.join(outputRoot, 'req_demo');
   const reqDemoFile = path.join(reqDemoDir, 'request_demo.txt');
 
   try {
     fs.mkdirSync(reqDemoDir, { recursive: true });
-    const fileContent = `Email: ${email}\nPhone: ${phone}\nTimestamp: ${new Date().toISOString()}\n--------------------------------------------------\n`;
+    const fileContent = `Name:${name}\nEmail: ${email}\nPhone: ${phone}\nTimestamp: ${new Date().toISOString()}\n--------------------------------------------------\n`;
     fs.appendFileSync(reqDemoFile, fileContent);
 
     console.log('Demo request saved to:', reqDemoFile);
