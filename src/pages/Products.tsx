@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Products = () => {
   const [email, setEmail] = useState('');
@@ -76,17 +78,19 @@ const Products = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+        toast.error(errorMessage);
+        return;
       }
 
       console.log('Demo requested and data saved:', { email, phone });
       setEmail('');
       setPhone('');
-      alert('Demo request submitted successfully!'); // or a toast notification
+      toast.success("Demo request sent, we'll get back soon!");
 
     } catch (error) {
       console.error('Error submitting demo request:', error);
-      alert('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     }
   };
 
@@ -165,8 +169,8 @@ const Products = () => {
       {/* Demo Request */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-xl mx-auto text-center text-white">
-          <h2 className="text-3xl font-bold mb-8">Request a Demo</h2>
+        <div className="max-w-xl mx-auto text-center text-white">
+            <h2 className="text-3xl font-bold mb-8">Request a Demo</h2>
             <p className="text-lg mb-8">
               Ready to experience the future of interactive learning?
               Fill out the form below to request a personalized demo.
