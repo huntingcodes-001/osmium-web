@@ -11,13 +11,19 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 
+// Define the root output directory
+const outputRoot = path.join(__dirname, 'output');
+
 // Analytics Route
 app.post('/api/analytics', (req, res) => {
   const analyticsData = req.body;
 
+  // Ensure the main output directory exists
+  fs.mkdirSync(outputRoot, { recursive: true });
+
   // 1. User Info (on initial visit - Home Page)
   if (analyticsData.isInitialVisit) {
-    const userInfoDir = path.join(__dirname, 'user_output');
+    const userInfoDir = path.join(outputRoot, 'user_output');
     const userInfoFile = path.join(userInfoDir, 'users_info.txt');
 
     try {
@@ -33,7 +39,7 @@ app.post('/api/analytics', (req, res) => {
   }
 
   // 2. User Interactions (all page visits)
-  const interactionsDir = path.join(__dirname, 'user_output');
+  const interactionsDir = path.join(outputRoot, 'user_output');
   const interactionsFile = path.join(interactionsDir, 'usr_interactions.txt');
 
   try {
@@ -52,7 +58,7 @@ app.post('/api/analytics', (req, res) => {
 app.post('/api/contact', async (req, res) => {
   const formData = req.body;
 
-  const outputDir = path.join(__dirname, 'contact_data');
+  const outputDir = path.join(outputRoot, 'contact_data');
   const fileName = `contact_${Date.now()}.txt`;
   const filePath = path.join(outputDir, fileName);
 
@@ -81,7 +87,7 @@ Timestamp: ${new Date().toISOString()}
 app.post('/api/request-demo', (req, res) => {
   const { email, phone } = req.body;
 
-  const reqDemoDir = path.join(__dirname, 'req_demo');
+  const reqDemoDir = path.join(outputRoot, 'req_demo');
   const reqDemoFile = path.join(reqDemoDir, 'request_demo.txt');
 
   try {
@@ -97,7 +103,6 @@ app.post('/api/request-demo', (req, res) => {
     res.status(500).json({ message: 'Error saving demo request' });
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
