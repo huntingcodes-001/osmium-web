@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 contact_data
+user_output
 
 # Editor directories and files
 .vscode/*
