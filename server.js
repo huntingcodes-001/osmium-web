@@ -11,6 +11,7 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 
+// Analytics Route
 app.post('/api/analytics', (req, res) => {
   const analyticsData = req.body;
 
@@ -20,12 +21,10 @@ app.post('/api/analytics', (req, res) => {
     const userInfoFile = path.join(userInfoDir, 'users_info.txt');
 
     try {
-      fs.mkdirSync(userInfoDir, { recursive: true }); // Create directory if needed
-
+      fs.mkdirSync(userInfoDir, { recursive: true });
       const formattedData = Object.entries(analyticsData)
         .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: ${value}`)
         .join('\n');
-
       fs.appendFileSync(userInfoFile, formattedData + '\n------------------------------------------------------------------------------\n');
       console.log(`User info saved to ${userInfoFile}`);
     } catch (error) {
@@ -38,8 +37,7 @@ app.post('/api/analytics', (req, res) => {
   const interactionsFile = path.join(interactionsDir, 'usr_interactions.txt');
 
   try {
-    fs.mkdirSync(interactionsDir, { recursive: true }); // Create directory if needed
-
+    fs.mkdirSync(interactionsDir, { recursive: true });
     const interactionData = `${analyticsData.ip} - ${analyticsData.serverTimestamp} - Page: ${analyticsData.currentPage} - Entry Time: ${analyticsData.entryTime} - Exit Time: ${analyticsData.exitTime || "Not exited yet"} - Duration: ${analyticsData.duration || "Not exited yet"}\n`;
     fs.appendFileSync(interactionsFile, interactionData);
     console.log(`User interaction saved to ${interactionsFile}`);
@@ -50,8 +48,8 @@ app.post('/api/analytics', (req, res) => {
   res.status(200).json({ message: 'Analytics data received' });
 });
 
-
-app.post('/api/contact', async (req, res) => {  // Contact form route
+// Contact Form Route
+app.post('/api/contact', async (req, res) => {
   const formData = req.body;
 
   const outputDir = path.join(__dirname, 'contact_data');
@@ -60,7 +58,6 @@ app.post('/api/contact', async (req, res) => {  // Contact form route
 
   try {
     await fs.promises.mkdir(outputDir, { recursive: true });
-
     const fileContent = `
 Name: ${formData.name}
 Email: ${formData.email}
@@ -77,6 +74,27 @@ Timestamp: ${new Date().toISOString()}
   } catch (error) {
     console.error("Error saving contact form data:", error);
     res.status(500).json({ message: 'Error saving message', error: error.message });
+  }
+});
+
+// Demo Request Route
+app.post('/api/request-demo', (req, res) => {
+  const { email, phone } = req.body;
+
+  const reqDemoDir = path.join(__dirname, 'req_demo');
+  const reqDemoFile = path.join(reqDemoDir, 'request_demo.txt');
+
+  try {
+    fs.mkdirSync(reqDemoDir, { recursive: true });
+    const fileContent = `Email: ${email}\nPhone: ${phone}\nTimestamp: ${new Date().toISOString()}\n--------------------------------------------------\n`;
+    fs.appendFileSync(reqDemoFile, fileContent);
+
+    console.log('Demo request saved to:', reqDemoFile);
+    res.status(200).json({ message: 'Demo request received' });
+
+  } catch (error) {
+    console.error('Error saving demo request:', error);
+    res.status(500).json({ message: 'Error saving demo request' });
   }
 });
 

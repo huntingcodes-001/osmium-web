@@ -62,12 +62,32 @@ const Products = () => {
     }
   ];
 
-  const handleDemoRequest = (e: React.FormEvent) => {
+  const handleDemoRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle demo request logic here
-    console.log('Demo requested:', { email, phone });
-    setEmail('');
-    setPhone('');
+
+    try {
+      const response = await fetch('/api/request-demo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, phone }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      console.log('Demo requested and data saved:', { email, phone });
+      setEmail('');
+      setPhone('');
+      alert('Demo request submitted successfully!'); // or a toast notification
+
+    } catch (error) {
+      console.error('Error submitting demo request:', error);
+      alert('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -143,30 +163,39 @@ const Products = () => {
       </section>
 
       {/* Demo Request */}
-      <section className="py-20 bg-blue-600">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-xl mx-auto text-center text-white">
-            <h2 className="text-3xl font-bold mb-8">Request a Demo</h2>
-            <form onSubmit={handleDemoRequest} className="space-y-4">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email"
-                className="w-full px-4 py-2 rounded-lg text-gray-900"
-                required
-              />
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Your Phone Number"
-                className="w-full px-4 py-2 rounded-lg text-gray-900"
-                required
-              />
+          <h2 className="text-3xl font-bold mb-8">Request a Demo</h2>
+            <p className="text-lg mb-8">
+              Ready to experience the future of interactive learning?
+              Fill out the form below to request a personalized demo.
+            </p>
+
+            <form onSubmit={handleDemoRequest} className="space-y-6">
+              <div className="rounded-lg bg-white/10 backdrop-blur-sm p-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your Email"
+                  className="w-full px-4 py-3 rounded-lg bg-transparent border-none text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  required
+                />
+              </div>
+              <div className="rounded-lg bg-white/10 backdrop-blur-sm p-2">
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Your Phone Number"
+                  className="w-full px-4 py-3 rounded-lg bg-transparent border-none text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  required
+                />
+              </div>
               <button
                 type="submit"
-                className="w-full bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="w-full bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
               >
                 Request Demo
               </button>
