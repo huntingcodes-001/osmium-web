@@ -5,7 +5,9 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import About from './pages/About';
-import Contact from './pages/Contact';  // Make sure Contact is imported
+import Contact from './pages/Contact';
+import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS
 
 function App() {
   return (
@@ -17,7 +19,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
             <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<ContactWithFormHandler />} /> {/* Use the wrapped component */}
+            <Route path="/contact" element={<ContactWithFormHandler />} />
           </Routes>
         </main>
         <Footer />
@@ -26,8 +28,6 @@ function App() {
   );
 }
 
-
-// Wrap the Contact component with a form handler
 const ContactWithFormHandler = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -51,19 +51,33 @@ const ContactWithFormHandler = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Try to parse JSON error
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const contentType = response.headers.get('content-type');
+        let errorMessage = "An error occurred. Please try again.";
+
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+          } catch (jsonError) {
+            console.error("Error parsing JSON error response:", jsonError);
+          }
+        } else {
+          const errorText = await response.text();
+          errorMessage = `Server error: ${response.status} - ${errorText}`;
+        }
+        toast.error(errorMessage); // Toast for error
+        return; // Stop further execution in case of error
       }
 
       setFormData({ name: '', email: '', phone: '', message: '' });
       if (formRef.current) {
         formRef.current.reset();
       }
-      alert('Message sent successfully!');
+      toast.success("Message sent successfully!"); // Toast for success
 
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('An error occurred. Please try again.');
+      toast.error("An error occurred. Please try again."); // Toast for fetch error
     }
   };
 
@@ -72,14 +86,17 @@ const ContactWithFormHandler = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  return <Contact 
-    formData={formData} 
-    handleChange={handleChange} 
-    handleSubmit={handleSubmit} 
-    formRef={formRef} 
-  />;
+  return (
+    <> {/* Fragment to wrap Contact and ToastContainer */}
+      <Contact
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        formRef={formRef}
+      />
+      <ToastContainer /> {/* Add ToastContainer */}
+    </>
+  );
 };
-
-
 
 export default App;
