@@ -1,5 +1,0 @@
-Name: Amir Zakaria
-Email: hi@gmail.com
-Phone: 567890
-Message: hj
-Timestamp: 2025-02-21T07:42:32.705Z
